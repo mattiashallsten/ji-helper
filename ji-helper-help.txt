@@ -1,0 +1,21 @@
+Usage:
+
+	$ python3 ji-helper.py <command> <arguments>
+
+Commands:
+
+	--- min ---
+
+	minimizes one ratio, i.e 10/8 becomes 5/4
+
+	--- force ---
+
+	forces one ratio into the octave range, i.e 9/4 becomes 9/8
+
+	--- mult ---
+
+	multiplies two ratios and minimizes them
+
+	--- div ---
+
+	divides two ratios and minimizes them
