@@ -1,6 +1,30 @@
+###############
+# --- TODO ---#
+###############
+
+# [x] simplify/minimize a fraction, making it easier to read
+
+# [x] force a ratio into an octave
+
+# [x] multiply two or more ratios, make it easy to read
+
+# [] divide two or more ratios, make it easy to read
+
+# [x] give common names for the ratios
+
+# [] supply a name, get suggestions for ratios in different limits
+
+# [] power of an interval, i.e pow 3/2 4 equals 81/64
+
+# [] generate a scale in some way
+
+# [] implement a way to chose what processes to do, i.e -m -f is to
+#    both minimize and force, -p -m is to both multiply and print
+
 from math import gcd
 import math
 import sys
+import argparse
 
 intervalnames = [
     'prime',
@@ -32,101 +56,217 @@ intervalnames = [
 def ratiomidi(ratio):
     return round(24 * math.log2(ratio)) / 2
 
+def ratio_to_list(ratiostring):
+    return ratiostring.split('/')
+
 # main class
 class Ratio:
     def __init__(self, num, den):
         self.num = int(num)
         self.den = int(den)
+        self.value = self.num / self.den
+        return None
 
     def printratio(self):
-        print("The ratio is: " + str(self.num) + "/" + str(self.den))
+        print_msg = str(self.num) + "/" + str(self.den)
+        return print_msg
 
     def minfrac(self):
         divisor = gcd(self.num, self.den)
         self.num = int(self.num / divisor)
         self.den = int(self.den / divisor)
 
+        return None
+
     def forceoct(self):
         if self.num / self.den >= 2:
             self.den = int(self.den * 2)
             return self.forceoct()
-
+        
         elif self.num / self.den < 1:
             self.num = int(self.num * 2)
             return self.forceoct()
-
+        
         else:
-            return self.minfrac()
+            return None
 
     def multiply(self, ratio2):
         self.num = self.num * ratio2.num
         self.den = self.den * ratio2.den
-
-        return self.forceoct()
-
+        
+        return None
+    
     def divide(self, ratio2):
-        self.num = self.num * ratio2.den
-        self.den = self.den * ratio2.num
+        num1, den1, num2, den2 = self.num, self.den, ratio2.num, ratio2.den
+        if self.value < ratio2.value:
+            
+            self.num = num2 * den1
 
-        return self.forceoct()
+            self.den = den2 * num1
 
+
+        else:
+            self.num = num1 * den2
+            self.den = den1 * num2
+            
+        return None
+    
     def approx(self):
-        ratiofloat = self.num / self.den
-        quarternote = int(ratiomidi(ratiofloat) * 2)
 
-        print_msg = "The given ratio is approximately a "
+        quarternote = int(ratiomidi(self.value) * 2) % 24
+
+        print_msg = str(self.num) + '/' + str(self.den)
+        print_msg += " is approximately a "
         print_msg += intervalnames[quarternote]
         print_msg += "."
-
+        
         return print(print_msg)
 
-  
-# reading creation arguments
-  
-if sys.argv[1] == 'min':
-    argstr = sys.argv[2].split('/')
-    ratio = Ratio(argstr[0], argstr[1])
+class RatioCollection:
+    def __init__(self, ratios, ratioinput):
+        self.ratios = list(ratios)
+        self.ratioinput = list(ratioinput)
+        
+    def minfrac(self):
+        for i in range(0, len(self.ratios)):
+            self.ratios[i].minfrac()
+                    
+        return self.ratios
 
-    ratio.minfrac()
+    def forceoct(self):
+        for i in range(0, len(self.ratios)):
+            self.ratios[i].forceoct()
 
-    ratio.printratio()
-  
-elif sys.argv[1] == 'force':
-    argstr = sys.argv[2].split('/')
-    ratio = Ratio(argstr[0], argstr[1])
+        return self.ratios
 
-    ratio.forceoct()
+    def multiply(self):
+        for i in reversed(range(0, len(self.ratios) - 1)):
+            self.ratios[i].multiply(self.ratios[i + 1])
 
-    ratio.printratio()
 
-elif sys.argv[1] == 'mult':
-    argstr1 = sys.argv[2].split('/')
-    argstr2 = sys.argv[3].split('/')
+        for i in reversed(range(0, len(self.ratios))):
+            if i != len(self.ratios) - 1:
+                self.ratios.pop(i)
 
-    ratio = Ratio(argstr1[0], argstr1[1])
-    ratio2 = Ratio(argstr2[0], argstr2[1])
+        return self.ratios
 
-    ratio.multiply(ratio2)
+    def divide(self):
+        if len(self.ratios) < 2:
+            print('Not enough ratios!')
+        else:
+            for i in range(0, len(self.ratios) - 1):
+                self.ratios[i].divide(self.ratios[i + 1])
 
-    ratio.printratio()
+            self.ratios.pop(len(self.ratios)-1)
 
-elif sys.argv[1] == 'div':
-    argstr1 = sys.argv[2].split('/')
-    ratio = Ratio(argstr1[0], argstr1[1])
+        return None
 
-    argstr2 = sys.argv[3].split('/')
-    ratio2 = Ratio(argstr2[0], argstr2[1])
+    def approx(self):
+        for ratio in self.ratios:
+            ratio.approx()
 
-    ratio.divide(ratio2)
+        
+def main():
+    
+    parser = argparse.ArgumentParser()
 
-    ratio.printratio()
+    parser.add_argument(
+        "--function", "-f", help="decide what function to use")
 
-elif sys.argv[1] == 'approx':
-    argstr = sys.argv[2].split('/')
-    ratio = Ratio(argstr[0], argstr[1])
+    parser.add_argument(
+        "--ratios", "-r", help="specify a number of ratios", nargs="+")
 
-    ratio.approx()
+    args = parser.parse_args()
+    
+    if args.function:
+        commands = list(args.function)
+    
+    if args.ratios:
+        ratios = []
+        for ratiostring in args.ratios:
+            ratio_as_list = ratiostring.split('/')
+            ratios.append(Ratio(ratio_as_list[0], ratio_as_list[1]))
 
-elif sys.argv[1] == 'help':
-    with open("ji-helper-help.txt") as f:
-        print(f.read())
+    ratiocollection = RatioCollection(ratios, args.ratios)
+
+    for command in commands:
+        
+        if command == 'm':
+            ratiocollection.minfrac()
+            for i in range(0, len(ratiocollection.ratios)):
+                print('Your input: \t' + ratiocollection.ratioinput[i])
+                print('Your output: \t' + ratiocollection.ratios[i].printratio())
+
+
+        elif command == 'f':
+            ratiocollection.forceoct()
+            for i in range(0, len(ratiocollection.ratios)):
+                print('Your input: \t' + ratiocollection.ratioinput[i])
+                print('Your output: \t' + ratiocollection.ratios[i].printratio())
+
+        elif command == 'M':
+            ratiocollection.multiply()
+
+            print(ratiocollection.ratios[0].printratio())
+            print(len(ratiocollection.ratios))
+            # print(ratiocollection.ratios[len(ratiocollection.ratios) - 1].printratio())
+
+        elif command == 'D':
+            print('\n V V V V V \n')
+            print('- D I V I D E -')
+            ratiocollection.divide()
+
+            for i in range(0, len(ratiocollection.ratioinput) - 1):
+                print_msg = ratiocollection.ratioinput[i] + '---- \\ \n'
+                print_msg += '\t' + ratiocollection.ratios[i].printratio() + '\n'
+                print_msg += ratiocollection.ratioinput[i + 1] + '---- / \n'
+                print_msg += '----------'
+
+                print(print_msg)
+            # for i in range(0, len(ratios) - 1):
+            #     ratios[i].divide(ratios[i + 1])
+            #     print(ratios[i].printratio())
+
+        elif command == 'a':
+            print('\n V V V V V \n')
+            print('- A P P R O X I M A T E -\n')
+            ratiocollection.approx()
+            # print('----------')
+            # for ratio in ratios:
+            #     ratio.approx()
+            #     print('----------')
+            # for arg in arguments:
+            #     argstr = arg.split('/')
+            #     ratio = Ratio(argstr[0], argstr[1])
+            #     ratio.approx()
+            #     print('----------')
+        else:
+            print_str = 'Command not legible! \n \n'
+            print_str += 'Accepted commands are: \n'
+            print_str += '    m = Minimize the ratios \n'
+            print_str += '    f = Force the ratios into an octave \n'
+            print_str += '    M = Multiply the given ratios \n'
+            print_str += '    D = Divide the given ratios (the ratios between the ratios) \n'
+            print_str += '    a = Approximate the ratios'
+
+            print(print_str)
+
+    print('\n V V V V V \n')
+    print('- R E S U L T -')
+    
+    
+    print('Your inputs:')
+    print(ratiocollection.ratioinput)
+    print('\n')
+    print('Your outputs:')
+    ratio_output_list = []
+    for i in range(0, len(ratiocollection.ratios)):
+        ratio_output_list.append(ratiocollection.ratios[i].printratio())
+
+    print(ratio_output_list)
+    
+
+    
+
+if __name__ == "__main__":
+    main()
