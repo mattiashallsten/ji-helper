@@ -8,7 +8,7 @@
 
 # [x] multiply two or more ratios, make it easy to read
 
-# [] divide two or more ratios, make it easy to read
+# [x] divide two or more ratios, make it easy to read
 
 # [x] give common names for the ratios
 
@@ -18,7 +18,7 @@
 
 # [] generate a scale in some way
 
-# [] implement a way to chose what processes to do, i.e -m -f is to
+# [x] implement a way to chose what processes to do, i.e -m -f is to
 #    both minimize and force, -p -m is to both multiply and print
 
 from math import gcd
