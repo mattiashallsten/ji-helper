@@ -100,6 +100,7 @@ class Ratio:
         return None
     
     def divide(self, ratio2):
+        print_msg = ''
         num1, den1, num2, den2 = self.num, self.den, ratio2.num, ratio2.den
         if self.value < ratio2.value:
             
@@ -141,12 +142,12 @@ class RatioCollection:
             OUT.append(self.ratios[i].printratio())
 
         for i in range(0, len(IN)):
-            print_msg += IN[i] + ' turns into ' + OUT[i] + '\n'
+            print_msg += IN[i] + ' turns into ' + OUT[i]
 
         return print_msg
 
     def forceoct(self):
-        print_msg = '\n V V V V V \n \n'
+        print_msg = '\n V V V V V \n'
         print_msg += '- F O R C E  O C T A V E - \n \n'
         IN = []
         OUT = []
@@ -161,21 +162,34 @@ class RatioCollection:
         return print_msg
 
     def multiply(self):
-        print('\n V V V V V \n')
-        print('- M U L T I P L Y -')
+        print_msg = '\n V V V V V \n \n'
+        print_msg += '- M U L T I P L Y - \n \n'
+        IN = []
+        OUT = ''
+
+        for i in range(0, len(self.ratios)):
+            IN.append(self.ratios[i].printratio())
+            print_msg += IN[i]
+            if i < len(self.ratios) - 1:
+                print_msg += ' * '
+                
         for i in reversed(range(0, len(self.ratios) - 1)):
             self.ratios[i].multiply(self.ratios[i + 1])
 
-
         for i in reversed(range(0, len(self.ratios))):
-            if i != len(self.ratios) - 1:
+            if i != 0:
                 self.ratios.pop(i)
 
-        return self.ratios
+        OUT = self.ratios[0].printratio()
+
+        print_msg += ' = ' + OUT
+
+        return print_msg
 
     def divide(self):
+        print_msg = ''
         if len(self.ratios) < 2:
-            print('Not enough ratios!')
+            print_msg += 'Not enough ratios!'
         else:
             print('\n V V V V V \n')
             print('- D I V I D E -')
@@ -184,8 +198,8 @@ class RatioCollection:
 
             self.ratios.pop(len(self.ratios)-1)
 
-        return None
-
+        return print(print_msg)
+    
     def approx(self):
         for ratio in self.ratios:
             ratio.approx()
@@ -226,10 +240,10 @@ def main():
             print(ratiocollection.forceoct())
 
         elif command == 'M':
-            ratiocollection.multiply()
+            print(ratiocollection.multiply())
 
-            print(ratiocollection.ratios[0].printratio())
-            print(len(ratiocollection.ratios))
+            # print(ratiocollection.ratios[0].printratio())
+            # print(len(ratiocollection.ratios))
             # print(ratiocollection.ratios[len(ratiocollection.ratios) - 1].printratio())
 
         elif command == 'D':
