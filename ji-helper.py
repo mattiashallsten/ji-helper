@@ -77,8 +77,10 @@ class Ratio:
         self.den = int(self.den / divisor)
 
         return None
-
+    
     def forceoct(self):
+
+        
         if self.num / self.den >= 2:
             self.den = int(self.den * 2)
             return self.forceoct()
@@ -88,6 +90,7 @@ class Ratio:
             return self.forceoct()
         
         else:
+
             return None
 
     def multiply(self, ratio2):
@@ -128,18 +131,38 @@ class RatioCollection:
         self.ratioinput = list(ratioinput)
         
     def minfrac(self):
+        print_msg = '\n V V V V V \n \n'
+        print_msg += '- M I N I M I Z E -\n \n'
+        IN = []
+        OUT = []
         for i in range(0, len(self.ratios)):
+            IN.append(self.ratios[i].printratio())
             self.ratios[i].minfrac()
-                    
-        return self.ratios
+            OUT.append(self.ratios[i].printratio())
+
+        for i in range(0, len(IN)):
+            print_msg += IN[i] + ' turns into ' + OUT[i] + '\n'
+
+        return print_msg
 
     def forceoct(self):
+        print_msg = '\n V V V V V \n \n'
+        print_msg += '- F O R C E  O C T A V E - \n \n'
+        IN = []
+        OUT = []
         for i in range(0, len(self.ratios)):
+            IN.append(self.ratios[i].printratio())
             self.ratios[i].forceoct()
+            OUT.append(self.ratios[i].printratio())
 
-        return self.ratios
+        for i in range(0, len(IN)):
+            print_msg += IN[i] + ' turns into ' + OUT[i] + '\n'
+
+        return print_msg
 
     def multiply(self):
+        print('\n V V V V V \n')
+        print('- M U L T I P L Y -')
         for i in reversed(range(0, len(self.ratios) - 1)):
             self.ratios[i].multiply(self.ratios[i + 1])
 
@@ -154,6 +177,8 @@ class RatioCollection:
         if len(self.ratios) < 2:
             print('Not enough ratios!')
         else:
+            print('\n V V V V V \n')
+            print('- D I V I D E -')
             for i in range(0, len(self.ratios) - 1):
                 self.ratios[i].divide(self.ratios[i + 1])
 
@@ -189,20 +214,16 @@ def main():
 
     ratiocollection = RatioCollection(ratios, args.ratios)
 
+    print('Your inputs:\n')
+    print(ratiocollection.ratioinput)
+    
     for command in commands:
         
         if command == 'm':
-            ratiocollection.minfrac()
-            for i in range(0, len(ratiocollection.ratios)):
-                print('Your input: \t' + ratiocollection.ratioinput[i])
-                print('Your output: \t' + ratiocollection.ratios[i].printratio())
-
+            print(ratiocollection.minfrac())
 
         elif command == 'f':
-            ratiocollection.forceoct()
-            for i in range(0, len(ratiocollection.ratios)):
-                print('Your input: \t' + ratiocollection.ratioinput[i])
-                print('Your output: \t' + ratiocollection.ratios[i].printratio())
+            print(ratiocollection.forceoct())
 
         elif command == 'M':
             ratiocollection.multiply()
@@ -212,8 +233,6 @@ def main():
             # print(ratiocollection.ratios[len(ratiocollection.ratios) - 1].printratio())
 
         elif command == 'D':
-            print('\n V V V V V \n')
-            print('- D I V I D E -')
             ratiocollection.divide()
 
             for i in range(0, len(ratiocollection.ratioinput) - 1):
