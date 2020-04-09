@@ -67,6 +67,9 @@ class Ratio:
         self.value = self.num / self.den
         return None
 
+    def updatevalue(self):
+        self.value = self.num / self.den
+
     def printratio(self):
         print_msg = str(self.num) + "/" + str(self.den)
         return print_msg
@@ -114,6 +117,12 @@ class Ratio:
             self.den = den1 * num2
             
         return None
+
+    def power_of(self, factor):
+        self.num = pow(self.num, int(factor))
+        self.den = pow(self.den, int(factor))
+
+        self.updatevalue()
     
     def approx(self):
 
@@ -140,14 +149,14 @@ class RatioCollection:
             IN.append(self.ratios[i].printratio())
             self.ratios[i].minfrac()
             OUT.append(self.ratios[i].printratio())
-
+            
         for i in range(0, len(IN)):
             print_msg += IN[i] + ' turns into ' + OUT[i]
-
+            
         return print_msg
-
+    
     def forceoct(self):
-        print_msg = '\n V V V V V \n'
+        print_msg = '\n V V V V V \n \n'
         print_msg += '- F O R C E  O C T A V E - \n \n'
         IN = []
         OUT = []
@@ -155,18 +164,18 @@ class RatioCollection:
             IN.append(self.ratios[i].printratio())
             self.ratios[i].forceoct()
             OUT.append(self.ratios[i].printratio())
-
+        
         for i in range(0, len(IN)):
             print_msg += IN[i] + ' turns into ' + OUT[i] + '\n'
-
+        
         return print_msg
-
+    
     def multiply(self):
         print_msg = '\n V V V V V \n \n'
         print_msg += '- M U L T I P L Y - \n \n'
         IN = []
         OUT = ''
-
+        
         for i in range(0, len(self.ratios)):
             IN.append(self.ratios[i].printratio())
             print_msg += IN[i]
@@ -175,17 +184,17 @@ class RatioCollection:
                 
         for i in reversed(range(0, len(self.ratios) - 1)):
             self.ratios[i].multiply(self.ratios[i + 1])
-
+        
         for i in reversed(range(0, len(self.ratios))):
             if i != 0:
                 self.ratios.pop(i)
-
+        
         OUT = self.ratios[0].printratio()
-
+        
         print_msg += ' = ' + OUT
-
+        
         return print_msg
-
+    
     def divide(self):
         print_msg = ''
         if len(self.ratios) < 2:
@@ -199,7 +208,24 @@ class RatioCollection:
             self.ratios.pop(len(self.ratios)-1)
 
         return print(print_msg)
+
+    def power_of(self, factor):
+        print_msg = '\n V V V V V \n \n'
+        print_msg += '- P O W E R  O F ' + str(factor) + ' - \n \n'
     
+        IN = []
+        OUT = []
+
+        for i in range(0, len(self.ratios)):
+            IN.append(self.ratios[i].printratio())
+            self.ratios[i].power_of(factor)
+            OUT.append(self.ratios[i].printratio())
+
+        for i in range(0, len(IN)):
+            print_msg += 'The power of ' + IN[i] + ' is ' + OUT[i] + '\n'
+
+        return print(print_msg)
+            
     def approx(self):
         for ratio in self.ratios:
             ratio.approx()
@@ -273,6 +299,10 @@ def main():
             #     ratio = Ratio(argstr[0], argstr[1])
             #     ratio.approx()
             #     print('----------')
+
+        elif command.isdigit():
+            ratiocollection.power_of(int(command))
+        
         else:
             print_str = 'Command not legible! \n \n'
             print_str += 'Accepted commands are: \n'
